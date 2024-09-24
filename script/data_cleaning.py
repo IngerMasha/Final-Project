@@ -1,48 +1,34 @@
-import numpy as np
 import pandas as pd
+import re
 
-
-file_path = ('C:/Users/inger/PycharmProjects/pythonProject1/data/books_1.Best_Books_Ever.csv')
+# Загрузка данных
+file_path = 'C:/Users/inger/PycharmProjects/pythonProject1/data/books_1.Best_Books_Ever.csv'
 df = pd.read_csv(file_path)
 
-# Настройка отображения всех колонок и их ширины
 pd.set_option('display.max_columns', None)  # Показать все столбцы
 pd.set_option('display.width', 1000)  # Установить ширину вывода
 
-print("Количество пропущенных значений после очистки:")
-print(df.isnull().sum())
-print(df.info())
+# print("Количество пропущенных значений после очистки:")
+# print(df.isnull().sum())
+# print(df.head())
+# Функция для проверки, содержит ли название только латинские буквы
+def is_latin(text):
+    return bool(re.match(r'^[a-zA-Z0-9\s.,!?\'":;()-]*$', str(text)))
 
-# Заполнение пропусков
-# df['series'].fillna('Unknown', inplace=True) #df.method({col: value}, inplace=True)
-df.fillna({'series': 'Unknown'},  inplace=True)
-df.fillna({'language': df['language'].mode()[0]}, inplace=True)
-df.fillna({'bookFormat': 'Unknown'}, inplace=True)
-df.fillna({'publisher': 'Unknown'}, inplace=True)
-df.fillna({'firstPublishDate': 'Unknown'}, inplace=True)
-df.fillna({'publishDate': 'Unknown'}, inplace=True)
+# Применяем функцию is_latin для фильтрации строк с латинскими названиями
+df_latin = df[df['title'].apply(is_latin)]
 
+# Удаление строк, содержащих '(Goodreads Author)' в имени автора
+df_cleaned = df_latin[~df_latin['author'].str.contains(r'\(Goodreads Author\)', na=False)]
 
-df['author'] = df['author'].str.replace(r'\s*\(Goodreads Author\)', ' (GA)', regex=True)
+# Удаление явных дубликатов по ISBN, названию и автору
+df_cleaned = df_cleaned.drop_duplicates(subset=['title', 'author'], keep='first')
 
-df.drop(columns=['edition'], inplace=True)
-df.drop(columns=['coverImg'], inplace=True)
+# Сохранение очищенных данных
+new_file_path = 'C:/Users/inger/PycharmProjects/pythonProject1/data/cleaned_books_data.csv'
+df_cleaned.to_csv(new_file_path, index=False)
 
-# Заполняем пропуски в числовых столбцах медианным значением
-# df['price'] = df['price'].replace(0, np.nan)
-df['pages'] = pd.to_numeric(df['pages'], errors='coerce')
-df['price'] = pd.to_numeric(df['price'], errors='coerce')
-df.fillna({'likedPercent': df['likedPercent'].median()}, inplace=True)
-df.fillna({'pages': df['pages'].median()}, inplace=True)
-df.fillna({'price': df['price'].median()}, inplace=True)
+print(f"Данные сохранены в файл: {new_file_path}")
 
+# print(df_cleaned.isnull().sum())
 
-
-# Проверка на наличие пропусков после очистки
-print("Количество пропущенных значений после очистки:")
-print(df.isnull().sum())
-
-print(df.head())
-
-cleaned_data_path = 'C:/Users/inger/PycharmProjects/pythonProject1/data/cleaned_books_data.csv'
-df.to_csv(cleaned_data_path, index=False)
