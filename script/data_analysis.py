@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from collections import Counter
 from scipy.signal import find_peaks
+from authors_genders import run_gender_analysis
+
 
 # Загружаем данные
 cleaned_data_path = 'C:/Users/inger/PycharmProjects/pythonProject1/data/final_books_data.csv'
@@ -108,6 +110,8 @@ plt.title('Publication Year Boxplot')
 plt.xlabel('Publication Year')
 plt.show(block=False)
 
+run_gender_analysis()
+
 # График количества книг по годам
 valid_years = df[(df['publishYear'] >= 1950) & (df['publishYear'] <= 2024)]
 books_per_year = valid_years['publishYear'].value_counts().sort_index()
@@ -138,3 +142,5 @@ for valley in valleys:
         plt.text(years[valley], counts[valley] * 0.9, str(int(years[valley])), color='black', ha='center')
 
 plt.show()
+
+
