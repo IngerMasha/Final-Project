@@ -8,9 +8,9 @@ df = pd.read_csv(file_path)
 pd.set_option('display.max_columns', None)  # Показать все столбцы
 pd.set_option('display.width', 1000)  # Установить ширину вывода
 
-# print("Количество пропущенных значений после очистки:")
-# print(df.isnull().sum())
-# print(df.head())
+print("Количество пропущенных значений после очистки:")
+print(df.isnull().sum())
+print(df.head())
 # Функция для проверки, содержит ли название только латинские буквы
 def is_latin(text):
     return bool(re.match(r'^[a-zA-Z0-9\s.,!?\'":;()-]*$', str(text)))
